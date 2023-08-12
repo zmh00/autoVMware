@@ -48,7 +48,7 @@ while True:
             window_target = auto.WindowControl(searchDepth=1, Name = WINDOW_TARGET, ProcessId=pid)
             if window_target.Exists(maxSearchSeconds=1): # 找到目標視窗
                 auto.Logger.WriteLine(f"TARGET WINDOW EXISTS", consoleColor=auto.ConsoleColor.Yellow)
-                window_target.SetFocus()
+                # window_target.SetFocus() 會干擾其他程式使用
                 bar = window_target.WindowControl(searchDepth=1, AutomationId = "ShadeBarWindow")
                 if bar.Exists():
                     auto.Logger.WriteLine(f"ShadeBar EXISTS", consoleColor=auto.ConsoleColor.Yellow)
