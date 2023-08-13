@@ -64,52 +64,57 @@ while True:
                 time.sleep(60)
             else: # 沒找到目標視窗
                 window = auto.WindowControl(searchDepth=1, Name = "VMware Horizon Client")
-                control = window.CustomControl(searchDepth=1)
-                if control.Exists():
-                    if control.ClassName == "WindowsPasswordAuthView": # 登入帳密輸入
-                        if ENGLISH_VERSION:
-                            control.EditControl(Name="Enter your user name").GetValuePattern().SetValue(ACCOUNT)
-                            control.EditControl(Name="Enter your password").GetValuePattern().SetValue(PASSWORD)
-                            control.ComboBoxControl(searchDepth=1).GetExpandCollapsePattern().Expand()
-                            time.sleep(0.5)
-                            control.ComboBoxControl(searchDepth=1).ListItemControl(searchDepth=1, Name = 'VGHTPE').GetSelectionItemPattern().Select()
-                            control.ButtonControl(Name="Login").GetInvokePattern().Invoke()
-                        else:
-                            control.EditControl(Name="輸入您的使用者名稱").GetValuePattern().SetValue(ACCOUNT)
-                            control.EditControl(Name="輸入您的密碼").GetValuePattern().SetValue(PASSWORD)
-                            control.ComboBoxControl(searchDepth=1).GetExpandCollapsePattern().Expand()
-                            time.sleep(0.5)
-                            control.ComboBoxControl(searchDepth=1).ListItemControl(searchDepth=1, Name = 'VGHTPE').GetSelectionItemPattern().Select()
-                            control.ButtonControl(Name="登入").GetInvokePattern().Invoke()
-                    elif control.ClassName =='EntitlementsView': # 目前有連線狀況下開啟指定連線
-                        list_control = control.ListControl(searchDepth=1)
-                        list_item = list_control.ListItemControl(Name = WINDOW_TARGET)
-                        if list_item.Exists():
-                            list_item.SetFocus()
-                            list_item.DoubleClick(simulateMove=False, waitTime=0.1)
-                    elif control.ClassName == 'ServersView': # 目前無連線狀況下開啟指定連線
-                        list_control = control.ListControl(searchDepth=1)
-                        list_item = list_control.ListItemControl(searchDepth=1)
-                        if list_item.Exists():
-                            list_item.SetFocus()
-                            list_item.DoubleClick(simulateMove=False, waitTime=0.1)
-                        else:
+                if window.Exists():
+                    control = window.CustomControl(searchDepth=1)
+                    if control.Exists():
+                        if control.ClassName == "WindowsPasswordAuthView": # 登入帳密輸入
                             if ENGLISH_VERSION:
-                                control.ToolBarControl(searchDepth=1).ButtonControl(searchDepth=1, Name='Add Server').GetInvokePattern().Invoke()
+                                control.EditControl(Name="Enter your user name").GetValuePattern().SetValue(ACCOUNT)
+                                control.EditControl(Name="Enter your password").GetValuePattern().SetValue(PASSWORD)
+                                control.ComboBoxControl(searchDepth=1).GetExpandCollapsePattern().Expand()
+                                time.sleep(0.5)
+                                control.ComboBoxControl(searchDepth=1).ListItemControl(searchDepth=1, Name = 'VGHTPE').GetSelectionItemPattern().Select()
+                                control.ButtonControl(Name="Login").GetInvokePattern().Invoke()
                             else:
-                                control.ToolBarControl(searchDepth=1).ButtonControl(searchDepth=1, Name='新增伺服器').GetInvokePattern().Invoke()
-                    elif control.ClassName == 'NewServerView': # 新增伺服器
-                        if ENGLISH_VERSION:
-                            window = auto.WindowControl(searchDepth=1, Name = "VMware Horizon Client")
-                            control.EditControl(searchDepth=1, Name='Name of the Connection Server').GetValuePattern().SetValue('vdt2.vghtpe.gov.tw')
-                            control.ButtonControl(searchDepth=1, Name='Connect').GetInvokePattern().Invoke()
-                        else:
-                            window = auto.WindowControl(searchDepth=1, Name = "VMware Horizon Client")
-                            control.EditControl(searchDepth=1, Name='連線伺服器的名稱').GetValuePattern().SetValue('vdt2.vghtpe.gov.tw')
-                            control.ButtonControl(searchDepth=1, Name='連線').GetInvokePattern().Invoke()
-                    # TODO
-                    # elif control.ClassName == '###': # 中斷跳出broker斷線
-                    #     control.ButtonControl(searchDepth=1, Name='Cancel').GetInvokePattern().Invoke()
+                                control.EditControl(Name="輸入您的使用者名稱").GetValuePattern().SetValue(ACCOUNT)
+                                control.EditControl(Name="輸入您的密碼").GetValuePattern().SetValue(PASSWORD)
+                                control.ComboBoxControl(searchDepth=1).GetExpandCollapsePattern().Expand()
+                                time.sleep(0.5)
+                                control.ComboBoxControl(searchDepth=1).ListItemControl(searchDepth=1, Name = 'VGHTPE').GetSelectionItemPattern().Select()
+                                control.ButtonControl(Name="登入").GetInvokePattern().Invoke()
+                        elif control.ClassName =='EntitlementsView': # 目前有連線狀況下開啟指定連線
+                            list_control = control.ListControl(searchDepth=1)
+                            list_item = list_control.ListItemControl(Name = WINDOW_TARGET)
+                            if list_item.Exists():
+                                list_item.SetFocus()
+                                list_item.DoubleClick(simulateMove=False, waitTime=0.1)
+                        elif control.ClassName == 'ServersView': # 目前無連線狀況下開啟指定連線
+                            list_control = control.ListControl(searchDepth=1)
+                            list_item = list_control.ListItemControl(searchDepth=1)
+                            if list_item.Exists():
+                                list_item.SetFocus()
+                                list_item.DoubleClick(simulateMove=False, waitTime=0.1)
+                            else:
+                                if ENGLISH_VERSION:
+                                    control.ToolBarControl(searchDepth=1).ButtonControl(searchDepth=1, Name='Add Server').GetInvokePattern().Invoke()
+                                else:
+                                    control.ToolBarControl(searchDepth=1).ButtonControl(searchDepth=1, Name='新增伺服器').GetInvokePattern().Invoke()
+                        elif control.ClassName == 'NewServerView': # 新增伺服器
+                            if ENGLISH_VERSION:
+                                window = auto.WindowControl(searchDepth=1, Name = "VMware Horizon Client")
+                                control.EditControl(searchDepth=1, Name='Name of the Connection Server').GetValuePattern().SetValue('vdt2.vghtpe.gov.tw')
+                                control.ButtonControl(searchDepth=1, Name='Connect').GetInvokePattern().Invoke()
+                            else:
+                                window = auto.WindowControl(searchDepth=1, Name = "VMware Horizon Client")
+                                control.EditControl(searchDepth=1, Name='連線伺服器的名稱').GetValuePattern().SetValue('vdt2.vghtpe.gov.tw')
+                                control.ButtonControl(searchDepth=1, Name='連線').GetInvokePattern().Invoke()
+                else:
+                    w = auto.WindowControl(searchDepth=1, Name = "VMware Horizon Client Content Dialog")
+                    if w.Exists():
+                        w.GetWindowPattern().Close()
+                    else:
+                        auto.Logger.WriteLine(f"TARGET WINDOW NOT EXISTS, OPENING...", consoleColor=auto.ConsoleColor.Yellow)
+                        os.startfile(PROCESS_PATH)
             time.sleep(1)
         else:
             auto.Logger.WriteLine(f"TARGET PROGRAM NOT EXISTS, OPENING...", consoleColor=auto.ConsoleColor.Yellow)
