@@ -50,6 +50,7 @@ while True:
             if window_target.Exists(maxSearchSeconds=1): # 找到目標視窗
                 auto.Logger.WriteLine(f"{datetime.datetime.today().strftime(r'%Y/%m/%d %H:%M:%S')}|TARGET WINDOW EXISTS\r", consoleColor=auto.ConsoleColor.Yellow, )
                 # window_target.SetFocus() 會干擾其他程式使用
+                # 關閉全螢幕
                 bar = window_target.WindowControl(searchDepth=1, AutomationId = "ShadeBarWindow")
                 if bar.Exists():
                     auto.Logger.WriteLine(f"ShadeBar EXISTS", consoleColor=auto.ConsoleColor.Yellow)
@@ -61,6 +62,11 @@ while True:
                     if control.Exists():
                         control.GetInvokePattern().Invoke()
                         auto.Logger.WriteLine(f"Exit Fullscreen", consoleColor=auto.ConsoleColor.Yellow)
+                # 調整視窗到最大
+                button = window_target.ButtonControl(searchDepth=1, Name='Maximize')
+                if button.Exists():
+                    button.GetInvokePattern().Invoke()
+                    auto.Logger.WriteLine(f"Maximize", consoleColor=auto.ConsoleColor.Yellow)
                 time.sleep(60)
             else: # 沒找到目標視窗
                 window = auto.WindowControl(searchDepth=1, Name = "VMware Horizon Client")
