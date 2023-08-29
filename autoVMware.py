@@ -62,11 +62,12 @@ while True:
                     if control.Exists():
                         control.GetInvokePattern().Invoke()
                         auto.Logger.WriteLine(f"Exit Fullscreen", consoleColor=auto.ConsoleColor.Yellow)
-                # 調整視窗到最大
-                button = window_target.ButtonControl(searchDepth=1, Name='Maximize')
-                if button.Exists():
-                    button.GetInvokePattern().Invoke()
-                    auto.Logger.WriteLine(f"Maximize", consoleColor=auto.ConsoleColor.Yellow)
+                # 如果視窗在前景
+                if window_target.NativeWindowHandle == auto.GetForegroundWindow():
+                    # 調整視窗到最大
+                    if not window_target.IsMaximize():
+                        window_target.GetTransformPattern().Resize(1920,1080)
+                        auto.Logger.WriteLine(f"Resize to 1920*1080", consoleColor=auto.ConsoleColor.Yellow)
                 time.sleep(60)
             else: # 沒找到目標視窗
                 window = auto.WindowControl(searchDepth=1, Name = "VMware Horizon Client")
