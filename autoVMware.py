@@ -48,8 +48,10 @@ while True:
         if running:
             window_target = auto.WindowControl(searchDepth=1, Name = WINDOW_TARGET, ProcessId=pid)
             if window_target.Exists(maxSearchSeconds=1): # 找到目標視窗
-                auto.Logger.WriteLine(f"{datetime.datetime.today().strftime(r'%Y/%m/%d %H:%M:%S')}|TARGET WINDOW EXISTS\r", consoleColor=auto.ConsoleColor.Yellow, )
+
+                # auto.Logger.WriteLine(f"{datetime.datetime.today().strftime(r'%Y/%m/%d %H:%M:%S')}|TARGET WINDOW EXISTS\r", consoleColor=auto.ConsoleColor.Yellow, )
                 # window_target.SetFocus() 會干擾其他程式使用
+                
                 # 關閉全螢幕
                 bar = window_target.WindowControl(searchDepth=1, AutomationId = "ShadeBarWindow")
                 if bar.Exists():
@@ -115,6 +117,9 @@ while True:
                                 window = auto.WindowControl(searchDepth=1, Name = "VMware Horizon Client")
                                 control.EditControl(searchDepth=1, Name='連線伺服器的名稱').GetValuePattern().SetValue('vdt2.vghtpe.gov.tw')
                                 control.ButtonControl(searchDepth=1, Name='連線').GetInvokePattern().Invoke()
+                        elif control.ClassName == 'LoggingOutView': # 工作階段已逾時的狀態
+                            window = auto.WindowControl(searchDepth=1, Name = "VMware Horizon Client")
+                            window.ButtonControl(searchDepth=1, AutomationId='PrimaryButton').GetInvokePattern().Invoke()
                 else:
                     w = auto.WindowControl(searchDepth=1, Name = "VMware Horizon Client Content Dialog")
                     if w.Exists():
