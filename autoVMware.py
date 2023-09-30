@@ -33,6 +33,11 @@ config.read('autoVMware.ini', encoding='utf-8')
 
 ctypes.windll.kernel32.GetUserDefaultUILanguage()
 
+SLEEP_AFTER_FOUND = 60
+SLEEP_BEFORE_FOUND = 5
+NOT_FOUND = 0
+RESIZE_ALREADY = False
+
 ENGLISH_VERSION = True if (ctypes.windll.kernel32.GetUserDefaultUILanguage() == 1033) else False # 語言非英文目前視為中文
 PROCESS_NAME = config['DEFAULT'].get('PROCESS_NAME')
 PROCESS_PATH = config['DEFAULT'].get('PROCESS_PATH')
@@ -48,14 +53,14 @@ while True:
         if running:
             window_target = auto.WindowControl(searchDepth=1, Name = WINDOW_TARGET, ProcessId=pid)
             if window_target.Exists(maxSearchSeconds=1): # 找到目標視窗
-
+                NOT_FOUND = 0
                 # auto.Logger.WriteLine(f"{datetime.datetime.today().strftime(r'%Y/%m/%d %H:%M:%S')}|TARGET WINDOW EXISTS\r", consoleColor=auto.ConsoleColor.Yellow, )
                 # window_target.SetFocus() 會干擾其他程式使用
                 
                 # 關閉全螢幕
                 bar = window_target.WindowControl(searchDepth=1, AutomationId = "ShadeBarWindow")
                 if bar.Exists():
-                    auto.Logger.WriteLine(f"ShadeBar EXISTS", consoleColor=auto.ConsoleColor.Yellow)
+                    auto.Logger.WriteLine(f"{datetime.datetime.today()}|ShadeBar EXISTS", consoleColor=auto.ConsoleColor.Yellow)
                     bar.SetFocus()
                     if ENGLISH_VERSION:
                         control = bar.CustomControl(searchDepth=1).ToolBarControl(searchDepth=1).ButtonControl(searchDepth=1, Name='Exit Fullscreen')
@@ -63,15 +68,27 @@ while True:
                         control = bar.CustomControl(searchDepth=1).ToolBarControl(searchDepth=1).ButtonControl(searchDepth=1, Name='結束全螢幕')
                     if control.Exists():
                         control.GetInvokePattern().Invoke()
-                        auto.Logger.WriteLine(f"Exit Fullscreen", consoleColor=auto.ConsoleColor.Yellow)
+                        auto.Logger.WriteLine(f"{datetime.datetime.today()}|Exit Fullscreen", consoleColor=auto.ConsoleColor.Yellow)
                 # 如果視窗在前景
                 if window_target.NativeWindowHandle == auto.GetForegroundWindow():
                     # 調整視窗到最大
-                    if not window_target.IsMaximize():
+                    if not window_target.IsMaximize() and RESIZE_ALREADY == False:
                         window_target.GetTransformPattern().Resize(1920,1080)
-                        auto.Logger.WriteLine(f"Resize to 1920*1080", consoleColor=auto.ConsoleColor.Yellow)
-                time.sleep(60)
+                        auto.Logger.WriteLine(f"{datetime.datetime.today()}|Resize to 1920*1080", consoleColor=auto.ConsoleColor.Yellow)
+                        RESIZE_ALREADY = True
+                time.sleep(SLEEP_AFTER_FOUND)
+            elif NOT_FOUND > 1:
+                auto.Logger.WriteLine(f"{datetime.datetime.today()}|NOT_FOUND for {NOT_FOUND} times", consoleColor=auto.ConsoleColor.Yellow)
+                window = auto.WindowControl(searchDepth=1, Name = "VMware Horizon Client")
+                button = window.ButtonControl(AutomationId = 'PrimaryButton')
+                if button.Exists():
+                    button.GetInvokePattern().Invoke()
+                    NOT_FOUND = 0
+                else:
+                    auto.Logger.WriteLine(f"{datetime.datetime.today()}|NO OK Button Exists", consoleColor=auto.ConsoleColor.Red)
             else: # 沒找到目標視窗
+                NOT_FOUND = NOT_FOUND + 1 
+                RESIZE_ALREADY = False
                 window = auto.WindowControl(searchDepth=1, Name = "VMware Horizon Client")
                 if window.Exists():
                     control = window.CustomControl(searchDepth=1)
@@ -99,7 +116,7 @@ while True:
                                 list_item.DoubleClick(simulateMove=False, waitTime=0.1)
                         elif control.ClassName == 'ServersView': # 目前無連線狀況下開啟指定連線
                             list_control = control.ListControl(searchDepth=1)
-                            list_item = list_control.ListItemControl(searchDepth=1)
+                            list_item = list_control.ListItemControl(searchDepth=1) # TODO 應該加註"vde.vghtpe.gov.tw" or "vdt2.vghtpe.gov.tw"?
                             if list_item.Exists():
                                 list_item.SetFocus()
                                 list_item.DoubleClick(simulateMove=False, waitTime=0.1)
@@ -125,14 +142,14 @@ while True:
                     if w.Exists():
                         w.GetWindowPattern().Close()
                     else:
-                        auto.Logger.WriteLine(f"TARGET WINDOW NOT EXISTS, OPENING...", consoleColor=auto.ConsoleColor.Yellow)
+                        auto.Logger.WriteLine(f"{datetime.datetime.today()}|TARGET WINDOW NOT EXISTS, OPENING...", consoleColor=auto.ConsoleColor.Yellow)
                         os.startfile(PROCESS_PATH)
-            time.sleep(1)
+            time.sleep(SLEEP_BEFORE_FOUND)
         else:
-            auto.Logger.WriteLine(f"TARGET PROGRAM NOT EXISTS, OPENING...", consoleColor=auto.ConsoleColor.Yellow)
+            auto.Logger.WriteLine(f"{datetime.datetime.today()}|TARGET PROGRAM NOT EXISTS, OPENING...", consoleColor=auto.ConsoleColor.Yellow)
             os.startfile(PROCESS_PATH)
-            time.sleep(1)
+            time.sleep(SLEEP_BEFORE_FOUND)
     except:
-        time.sleep(1)
-        auto.Logger.WriteLine(f"{traceback.print_exc()}", consoleColor=auto.ConsoleColor.Red)
+        time.sleep(SLEEP_BEFORE_FOUND)
+        auto.Logger.WriteLine(f"{datetime.datetime.today()}|{traceback.print_exc()}", consoleColor=auto.ConsoleColor.Red)
         
