@@ -168,7 +168,20 @@ def main():
 
 config = configparser.ConfigParser()
 p = Path().glob('autoVMware*.ini')
-config.read(next(p).absolute(), encoding='utf-8') 
+path_list = list(p)
+if len(path_list) == 0: # 處理找不到ini file
+    auto.Logger.WriteLine(f"No 'autoVMware*.ini' file", consoleColor=auto.ConsoleColor.Red)
+    p_input = input("Please input location of ini file: ")
+    path_list.append(Path(p_input))
+
+for p in path_list: # iterate and read the ini file
+    try:
+        auto.Logger.WriteLine(f"Reading {p}", consoleColor=auto.ConsoleColor.Yellow)
+        config.read(next(p).absolute(), encoding='utf-8-sig') # deal with BOM
+        break
+    except:
+        auto.Logger.WriteLine(f"Reading {p} failed", consoleColor=auto.ConsoleColor.Red)
+        continue
 
 ctypes.windll.kernel32.GetUserDefaultUILanguage()
 
