@@ -177,7 +177,7 @@ if len(path_list) == 0: # 處理找不到ini file
 for p in path_list: # iterate and read the ini file
     try:
         auto.Logger.WriteLine(f"Reading {p}", consoleColor=auto.ConsoleColor.Yellow)
-        config.read(next(p).absolute(), encoding='utf-8-sig') # deal with BOM
+        config.read(p.absolute(), encoding='utf-8-sig') # deal with BOM
         break
     except:
         auto.Logger.WriteLine(f"Reading {p} failed", consoleColor=auto.ConsoleColor.Red)
