@@ -68,8 +68,8 @@ def main():
                         RESIZE_ALREADY = True
                     # 如果視窗在前景 => 取消放大避免擋住其它視窗
                     if window_target.NativeWindowHandle == auto.GetForegroundWindow() and RESIZE_ALREADY == False:
-                        RESIZE_X = 1280
-                        RESIZE_Y = 720
+                        RESIZE_X = 1920
+                        RESIZE_Y = 1080
                         window_target.GetTransformPattern().Resize(RESIZE_X, RESIZE_Y)
                         auto.Logger.WriteLine(f"{datetime.datetime.today()}|Resize to {RESIZE_X} * {RESIZE_Y}", consoleColor=auto.ConsoleColor.Yellow)
                         RESIZE_ALREADY = True
