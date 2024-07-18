@@ -48,7 +48,7 @@ def main():
                     # auto.Logger.WriteLine(f"{datetime.datetime.today().strftime(r'%Y/%m/%d %H:%M:%S')}|TARGET WINDOW EXISTS\r", consoleColor=auto.ConsoleColor.Yellow, )
                     # window_target.SetFocus() 會干擾其他程式使用
                     
-                    # 關閉全螢幕
+                    # 關閉全螢幕模式
                     bar = window_target.WindowControl(searchDepth=1, AutomationId = "ShadeBarWindow")
                     if bar.Exists():
                         auto.Logger.WriteLine(f"{datetime.datetime.today()}|ShadeBar EXISTS", consoleColor=auto.ConsoleColor.Yellow)
@@ -60,13 +60,19 @@ def main():
                         if control.Exists():
                             control.GetInvokePattern().Invoke()
                             auto.Logger.WriteLine(f"{datetime.datetime.today()}|Exit Fullscreen", consoleColor=auto.ConsoleColor.Yellow)
-                    # 如果視窗在前景
-                    if window_target.NativeWindowHandle == auto.GetForegroundWindow():
-                        # 調整視窗到最大
-                        if not window_target.IsMaximize() and RESIZE_ALREADY == False:
-                            window_target.GetTransformPattern().Resize(1920,1080)
-                            auto.Logger.WriteLine(f"{datetime.datetime.today()}|Resize to 1920*1080", consoleColor=auto.ConsoleColor.Yellow)
-                            RESIZE_ALREADY = True
+                    # 關閉最大化模式
+                    if window_target.IsMaximize():
+                        control = window_target.ButtonControl(searchDepth=1, Name = "Restore")
+                        control.GetInvokePattern().Invoke()
+                        auto.Logger.WriteLine(f"{datetime.datetime.today()}|Exit Maximize", consoleColor=auto.ConsoleColor.Yellow)
+                        RESIZE_ALREADY = True
+                    # 如果視窗在前景 => 取消放大避免擋住其它視窗
+                    if window_target.NativeWindowHandle == auto.GetForegroundWindow() and RESIZE_ALREADY == False:
+                        RESIZE_X = 1280
+                        RESIZE_Y = 720
+                        window_target.GetTransformPattern().Resize(RESIZE_X, RESIZE_Y)
+                        auto.Logger.WriteLine(f"{datetime.datetime.today()}|Resize to {RESIZE_X} * {RESIZE_Y}", consoleColor=auto.ConsoleColor.Yellow)
+                        RESIZE_ALREADY = True
                     time.sleep(SLEEP_AFTER_FOUND)
                 elif NOT_FOUND > 1:
                     FOUND = 0
