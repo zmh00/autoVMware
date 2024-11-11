@@ -35,6 +35,7 @@ def process_exists(process_name):
 def main():
     global FOUND, NOT_FOUND, RESIZE_ALREADY
     while True:
+        time.sleep(SLEEP_BEFORE_FOUND)
         try:
             running, pid = process_exists(PROCESS_NAME)
             if running:
@@ -48,30 +49,30 @@ def main():
                     # auto.Logger.WriteLine(f"{datetime.datetime.today().strftime(r'%Y/%m/%d %H:%M:%S')}|TARGET WINDOW EXISTS\r", consoleColor=auto.ConsoleColor.Yellow, )
                     # window_target.SetFocus() 會干擾其他程式使用
                     
-                    # 關閉全螢幕模式
-                    bar = window_target.WindowControl(searchDepth=1, AutomationId = "ShadeBarWindow")
-                    if bar.Exists():
-                        auto.Logger.WriteLine(f"{datetime.datetime.today()}|ShadeBar EXISTS", consoleColor=auto.ConsoleColor.Yellow)
-                        bar.SetFocus()
-                        if ENGLISH_VERSION:
-                            control = bar.CustomControl(searchDepth=1).ToolBarControl(searchDepth=1).ButtonControl(searchDepth=1, Name='Exit Fullscreen')
-                        else:
-                            control = bar.CustomControl(searchDepth=1).ToolBarControl(searchDepth=1).ButtonControl(searchDepth=1, Name='結束全螢幕')
-                        if control.Exists():
+                    if not RESIZE_ALREADY:
+                        # 關閉全螢幕模式
+                        bar = window_target.WindowControl(searchDepth=1, AutomationId = "ShadeBarWindow")
+                        if bar.Exists():
+                            auto.Logger.WriteLine(f"{datetime.datetime.today()}|ShadeBar EXISTS", consoleColor=auto.ConsoleColor.Yellow)
+                            bar.SetFocus()
+                            if ENGLISH_VERSION:
+                                control = bar.CustomControl(searchDepth=1).ToolBarControl(searchDepth=1).ButtonControl(searchDepth=1, Name='Exit Fullscreen')
+                            else:
+                                control = bar.CustomControl(searchDepth=1).ToolBarControl(searchDepth=1).ButtonControl(searchDepth=1, Name='結束全螢幕')
+                            if control.Exists():
+                                control.GetInvokePattern().Invoke()
+                                auto.Logger.WriteLine(f"{datetime.datetime.today()}|Exit Fullscreen", consoleColor=auto.ConsoleColor.Yellow)
+                        # 關閉最大化模式
+                        if window_target.IsMaximize():
+                            control = window_target.ButtonControl(searchDepth=1, Name = "Restore")
                             control.GetInvokePattern().Invoke()
-                            auto.Logger.WriteLine(f"{datetime.datetime.today()}|Exit Fullscreen", consoleColor=auto.ConsoleColor.Yellow)
-                    # 關閉最大化模式
-                    if window_target.IsMaximize():
-                        control = window_target.ButtonControl(searchDepth=1, Name = "Restore")
-                        control.GetInvokePattern().Invoke()
-                        auto.Logger.WriteLine(f"{datetime.datetime.today()}|Exit Maximize", consoleColor=auto.ConsoleColor.Yellow)
-                        RESIZE_ALREADY = True
-                    # 如果視窗在前景 => 取消放大避免擋住其它視窗
-                    if window_target.NativeWindowHandle == auto.GetForegroundWindow() and RESIZE_ALREADY == False:
-                        RESIZE_X = 1920
-                        RESIZE_Y = 1080
-                        window_target.GetTransformPattern().Resize(RESIZE_X, RESIZE_Y)
-                        auto.Logger.WriteLine(f"{datetime.datetime.today()}|Resize to {RESIZE_X} * {RESIZE_Y}", consoleColor=auto.ConsoleColor.Yellow)
+                            auto.Logger.WriteLine(f"{datetime.datetime.today()}|Exit Maximize", consoleColor=auto.ConsoleColor.Yellow)
+                        # 如果視窗在前景 => 取消放大避免擋住其它視窗
+                        if window_target.NativeWindowHandle == auto.GetForegroundWindow() and RESIZE_ALREADY == False:
+                            RESIZE_X = 1920
+                            RESIZE_Y = 1080
+                            window_target.GetTransformPattern().Resize(RESIZE_X, RESIZE_Y)
+                            auto.Logger.WriteLine(f"{datetime.datetime.today()}|Resize to {RESIZE_X} * {RESIZE_Y}", consoleColor=auto.ConsoleColor.Yellow)
                         RESIZE_ALREADY = True
                     time.sleep(SLEEP_AFTER_FOUND)
                 elif NOT_FOUND > 1:
@@ -145,7 +146,6 @@ def main():
                         else:
                             auto.Logger.WriteLine(f"{datetime.datetime.today()}|TARGET WINDOW NOT EXISTS, OPENING...", consoleColor=auto.ConsoleColor.Yellow)
                             os.startfile(PROCESS_PATH)
-                time.sleep(SLEEP_BEFORE_FOUND)
             else:
                 auto.Logger.WriteLine(f"{datetime.datetime.today()}|TARGET PROGRAM NOT EXISTS, OPENING...", consoleColor=auto.ConsoleColor.Yellow)
                 process_path =  Path(PROCESS_PATH)
@@ -167,9 +167,7 @@ def main():
                             auto.Logger.WriteLine(f"{datetime.datetime.today()}|INSTALLING FINISHED", consoleColor=auto.ConsoleColor.Yellow)
                             break
                     installer.GetWindowPattern().Close()
-                time.sleep(SLEEP_BEFORE_FOUND)
         except:
-            time.sleep(SLEEP_BEFORE_FOUND)
             auto.Logger.WriteLine(f"{datetime.datetime.today()}|{traceback.print_exc()}", consoleColor=auto.ConsoleColor.Red)
 
 config = configparser.ConfigParser()
